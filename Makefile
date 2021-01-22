@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall
-LDFLAGS=-lglfw -lGL
+LDFLAGS=-lglfw -lGL -lGLEW
 EXEC=furry-adventure
 SRC=$(wildcard src/*.c)
 OBJ=$(SRC:.c=.o)
@@ -14,7 +14,7 @@ $(EXEC): $(OBJ)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm -f *.o
+	rm -f $(OBJ)
 
 mrproper: clean
 	rm -f $(EXEC)
