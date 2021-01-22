@@ -53,19 +53,6 @@ int game_window_init(GameWindow* window, int width, int height, const char* titl
         return 0;
     }
 
-    const float square_vertices[] =
-    {
-        // Triangle 1
-        -0.5f,  0.5f, 0.f, // top left
-         0.5f,  0.5f, 0.f, // top right
-        -0.5f, -0.5f, 0.f, // bottom left
-
-        // Triangle 2
-        -0.5f, -0.5f, 0.f, // bottom left
-         0.5f,  0.5f, 0.f, // top right
-         0.5f, -0.5f, 0.f  // bottom right 
-    };
-
     GLuint square_vao;
     glGenVertexArrays(1, &square_vao);
     glBindVertexArray(square_vao);
@@ -111,20 +98,20 @@ void game_window_draw_rectangle(GameWindow* window, float x, float y, float widt
 {
     float gl_pos[3] =
     {
-        0.f,//-1.f + (x/width),
-        0.f,//-1.f + (y/height),
+        -1.f + x * 2.f/window->width,
+        1.f - y * 2.f/window->height,
          0.f
     };
 
     float gl_size[3] = 
     {
-        1.f,//2 * (width/window->width),
-        1.f,//2 * (height/window->height),
+        2 * (width/window->width),
+        2 * (height/window->height),
         1.f
     };
 
-    glUniform3fv(glGetUniformLocation(window->shader_id, "position"), 3, gl_pos);
-    glUniform3fv(glGetUniformLocation(window->shader_id, "size"), 3, gl_size);
-    glUniform4f(glGetUniformLocation(window->shader_id, "color"), color.r, color.g, color.b, color.a);
+    glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "position"), gl_pos[0], gl_pos[1], gl_pos[2]);
+    glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "size"), gl_size[0], gl_size[1], gl_size[2]);
+    glProgramUniform4f(window->shader_id, glGetUniformLocation(window->shader_id, "color"), color.r, color.g, color.b, color.a);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
