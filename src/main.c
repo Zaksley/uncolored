@@ -1,4 +1,4 @@
-#include "game_window.h"
+#include "game.h"
 
 int main(int argc, char const *argv[])
 {
@@ -15,9 +15,7 @@ int main(int argc, char const *argv[])
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        Color color = {1.0, 0.0, 0.0, 1.0};
-        game_window_draw_rectangle(&window, 20, 240, 20, 20, color);
-        game_window_draw_rectangle(&window, 200, 20, 40, 20, color);
+        draw(&window);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window.glfw_window);

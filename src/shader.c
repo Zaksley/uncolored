@@ -115,7 +115,6 @@ GLuint load_shader(GLenum type, const char *filename)
     
     return shader;
 }
-
 GLuint load_shaders(const char* vertex, const char* fragment)
 {
 	GLuint program_id = glCreateProgram();
