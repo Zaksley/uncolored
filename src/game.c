@@ -1,4 +1,5 @@
 #include "game.h"
+#define SIZE_SQUARE 32
 
 Color color_red = {1.0, 0.0, 0.0, 1.0};
 Color color_white = {1.0, 1.0, 1.0, 1.0};
@@ -27,24 +28,70 @@ void game_update(GameWindow* window, Game* game)
 
     if (is_key_released(game->right_state))
     {
+        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1; 
         game->player.x += game->player.size;
+        
     }
     if (is_key_released(game->left_state))
     {
+        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1;
         game->player.x -= game->player.size;
     }
     if (is_key_released(game->up_state))
     {
+        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1;
         game->player.y -= game->player.size;
     }
     if (is_key_released(game->down_state))
     {
+        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1;
         game->player.y += game->player.size;
     }
+
+    int board_x = game->player.x / SIZE_SQUARE;
+    int board_y = game->player.y / SIZE_SQUARE; 
+    game->board[board_x][board_y] = 1;
+
+    //TODO Fonction qui check si y'avait pas déjà quelque chose =>>> Mort du player
+
+    // Others squares
+    Square* Ennemy;
+    for(int i=0; i<game->size_x; i++)
+    {
+        for(int j=0; j<game->size_y; j++)
+        {
+            if (game->board[i][j] != -1 )
+            {
+                Ennemy = &game->board_square[i][j]; 
+                Ennemy->x += SIZE_SQUARE * Ennemy->direction_x;
+                Ennemy->y += SIZE_SQUARE * Ennemy->direction_y; 
+            }
+        }
+    }
+
 }
 
 void game_draw(GameWindow* window, Game* game)
 {
+
+
     // Draw player
     game_window_draw_rectangle(window, game->player.x, game->player.y, game->player.size, game->player.size, color_violet);
+
+    //Draw first ennemis
+
+    int pos_x;
+    int pos_y;  
+    for(int i=0; i<game->size_x; i++)
+    {
+        for(int j=0; j<game->size_y; j++)
+        {
+            if (game->board[i][j] != -1)
+            {
+                pos_x = 16 + i*SIZE_SQUARE;
+                pos_y = 16 + j*SIZE_SQUARE; 
+                game_window_draw_rectangle(window, pos_x, pos_y, SIZE_SQUARE, SIZE_SQUARE, color_red);
+            }
+        }
+    }
 }

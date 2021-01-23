@@ -11,6 +11,31 @@ int main(int argc, char const *argv[])
     game.player.x = 16;
     game.player.y = 16;
     game.player.size = 32;
+    game.size_x = 640/game.player.size;
+    game.size_y = 480/game.player.size; 
+
+    Square Ennemy; 
+    Ennemy.x = 336;
+    Ennemy.y = 48; 
+    Ennemy.direction_x = 1;
+    Ennemy.direction_y = 0; 
+
+    // - Init Board
+    for(int i=0; i<game.size_x; i++)
+    {
+        //fprintf(stderr, "i : %d", i); 
+        for(int j=0; j<game.size_y; j++)
+        {
+            game.board[i][j] = -1; 
+        }
+    }
+
+    int a = Ennemy.x / 32;
+    int b = Ennemy.y / 32; 
+    printf("a = %d\n", a);
+    printf("b = %d\n", b);
+    game.board[a][b] = 1; 
+    game.board_square[a][b] = Ennemy; 
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window.glfw_window))
