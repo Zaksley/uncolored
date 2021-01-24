@@ -1,5 +1,4 @@
 #include "game.h"
-#define SIZE_SQUARE 32
 
 Color color_red = {1.0, 0.0, 0.0, 1.0};
 Color color_white = {1.0, 1.0, 1.0, 1.0};
@@ -7,90 +6,113 @@ Color color_blue = {0.0, 0.0, 1.0, 1.0};
 Color color_green = {0.0, 1.0, 0.0, 1.0};
 Color color_violet = {0.75, 0.0, 0.75, 1.0}; 
 
-int is_key_released(KeyState state)
+void square_draw(Square* square, GameWindow* game_window)
 {
-    return state.current_state == GLFW_RELEASE && state.last_state == GLFW_PRESS;
+    game_window_draw_rectangle(game_window,
+                                SIZE_SQUARE / 2 + square->x * SIZE_SQUARE,
+                                SIZE_SQUARE / 2 + square->y * SIZE_SQUARE,
+                                square->size * SIZE_SQUARE,
+                                square->size * SIZE_SQUARE,
+                                square->color);
 }
 
-void game_update(GameWindow* window, Game* game)
+void game_init(GameWindow* game_window, Game* game)
 {
-    game->right_state.last_state = game->right_state.current_state;
-    game->right_state.current_state = glfwGetKey(window->glfw_window, GLFW_KEY_RIGHT);
+    input_state_set_window(&game->input, game_window->glfw_window);
+    game->player.x = 2;
+    game->player.y = 2;
+    game->player.size = 1;
+    game->size_x = GRID_SIZE;
+    game->size_y = GRID_SIZE; 
 
-    game->left_state.last_state = game->left_state.current_state;
-    game->left_state.current_state = glfwGetKey(window->glfw_window, GLFW_KEY_LEFT);
+    Square ennemy; 
+    ennemy.x = 10;
+    ennemy.y = 10; 
+    ennemy.direction_x = 1;
+    ennemy.direction_y = 0; 
 
-    game->up_state.last_state = game->up_state.current_state;
-    game->up_state.current_state = glfwGetKey(window->glfw_window, GLFW_KEY_UP);
-
-    game->down_state.last_state = game->down_state.current_state;
-    game->down_state.current_state = glfwGetKey(window->glfw_window, GLFW_KEY_DOWN);
-
-    if (is_key_released(game->right_state))
+    // - Init Board
+    for(int i=0; i<game->size_x; i++)
     {
-        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1; 
-        game->player.x += game->player.size;
+        //fprintf(stderr, "i : %d", i); 
+        for(int j=0; j<game->size_y; j++)
+        {
+            game->board[i][j] = -1; 
+        }
+    }
+
+    int a = ennemy.x;
+    int b = ennemy.y; 
+    printf("a = %d\n", a);
+    printf("b = %d\n", b);
+    game->board[a][b] = 1; 
+    game->board_square[a][b] = ennemy; 
+}
+
+void game_update(GameWindow* game_window, Game* game)
+{
+    input_state_update(&game->input);
+
+    if (is_key_released(&game->input, GLFW_KEY_RIGHT))
+    {
+        game->board[game->player.x][game->player.y] = -1; 
+        game->player.x += 1;
         
     }
-    if (is_key_released(game->left_state))
+    if (is_key_released(&game->input, GLFW_KEY_LEFT))
     {
-        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1;
-        game->player.x -= game->player.size;
+        game->board[game->player.x][game->player.y] = -1;
+        game->player.x -= 1;
     }
-    if (is_key_released(game->up_state))
+    if (is_key_released(&game->input, GLFW_KEY_UP))
     {
-        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1;
-        game->player.y -= game->player.size;
+        game->board[game->player.x][game->player.y] = -1;
+        game->player.y -= 1;
     }
-    if (is_key_released(game->down_state))
+    if (is_key_released(&game->input, GLFW_KEY_DOWN))
     {
-        game->board[game->player.x/SIZE_SQUARE][game->player.y/SIZE_SQUARE] = -1;
-        game->player.y += game->player.size;
+        game->board[game->player.x][game->player.y] = -1;
+        game->player.y += 1;
     }
 
-    int board_x = game->player.x / SIZE_SQUARE;
-    int board_y = game->player.y / SIZE_SQUARE; 
-    game->board[board_x][board_y] = 1;
+    game->board[game->player.x][game->player.y] = 1;
 
     //TODO Fonction qui check si y'avait pas déjà quelque chose =>>> Mort du player
 
     // Others squares
-    Square* Ennemy;
+    Square* ennemy;
     for(int i=0; i<game->size_x; i++)
     {
         for(int j=0; j<game->size_y; j++)
         {
             if (game->board[i][j] != -1 )
             {
-                Ennemy = &game->board_square[i][j]; 
-                Ennemy->x += SIZE_SQUARE * Ennemy->direction_x;
-                Ennemy->y += SIZE_SQUARE * Ennemy->direction_y; 
+                ennemy = &game->board_square[i][j]; 
+                ennemy->x += SIZE_SQUARE * ennemy->direction_x;
+                ennemy->y += SIZE_SQUARE * ennemy->direction_y; 
             }
         }
     }
 
 }
 
-void game_draw(GameWindow* window, Game* game)
+void game_draw(GameWindow* game_window, Game* game)
 {
-
-
     // Draw player
-    game_window_draw_rectangle(window, game->player.x, game->player.y, game->player.size, game->player.size, color_violet);
+    square_draw(&game->player, game_window);
 
     //Draw first ennemis
-
     int pos_x;
     int pos_y;  
-    for(int i=0; i<game->size_x; i++)
+    for (int i=0; i<game->size_x; i++)
     {
-        for(int j=0; j<game->size_y; j++)
+        for (int j=0; j<game->size_y; j++)
         {
             if (game->board[i][j] != -1)
             {
-                pos_x = 16 + i*SIZE_SQUARE;
-                pos_y = 16 + j*SIZE_SQUARE; 
-                game_window_draw_rectangle(window, pos_x, pos_y, SIZE_SQUARE, SIZE_SQUARE, color_red);
+                pos_x = SIZE_SQUARE/2 + i*SIZE_SQUARE;
+                pos_y = SIZE_SQUARE/2 + j*SIZE_SQUARE; 
+                game_window_draw_rectangle(game_window, pos_x, pos_y, SIZE_SQUARE, SIZE_SQUARE, color_red);
             }
         }
     }

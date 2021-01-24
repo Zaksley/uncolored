@@ -10,7 +10,7 @@ all: $(EXEC)
 $(EXEC): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-%.o: %.c
+%.o: %.c %.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:

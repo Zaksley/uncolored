@@ -1,15 +1,10 @@
 #pragma once
+
 #include "game_window.h"
+#include "input.h"
 
-
-
-typedef struct
-{
-    int last_state;
-    int current_state;
-} KeyState;
-
-int is_key_released(KeyState state);
+#define SIZE_SQUARE 32
+#define GRID_SIZE 100
 
 typedef struct
 {
@@ -18,22 +13,24 @@ typedef struct
 
     int direction_x;
     int direction_y;
-    Color couleur;
+    Color color;
 
 } Square;
 
+void square_draw(Square* square, GameWindow* game_window);
+
 typedef struct
 {
-    Square player;
-    KeyState up_state, down_state, left_state, right_state;
-
+    InputState input;
     int size_x;
     int size_y;
-    Square board_square[100][100]; 
-    int board[100][100];
+
+    Square player;
+    Square board_square[GRID_SIZE][GRID_SIZE]; 
+    int board[GRID_SIZE][GRID_SIZE];
  
 } Game;
 
-
-void game_update(GameWindow*, Game*);
-void game_draw(GameWindow*, Game*);
+void game_init(GameWindow* game_window, Game* game);
+void game_update(GameWindow* game_window, Game* game);
+void game_draw(GameWindow* game_window, Game* game);

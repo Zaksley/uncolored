@@ -17,5 +17,8 @@ typedef struct
 } GameWindow;
 
 int game_window_init(GameWindow* window, int width, int height, const char* title);
+int game_window_is_opened(GameWindow* window);
+void game_window_clear(GameWindow* window);
+void game_window_update(GameWindow* window);
 void game_window_free(GameWindow* window);
 void game_window_draw_rectangle(GameWindow* window, float x, float y, float width, float height, Color color);

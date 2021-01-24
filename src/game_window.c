@@ -16,6 +16,11 @@ const float square_vertices[] =
      0.5f, -0.5f, 0.f  // bottom right 
 };
 
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
 int game_window_init(GameWindow* window, int width, int height, const char* title)
 {
     /* Initialize the library */
@@ -40,6 +45,7 @@ int game_window_init(GameWindow* window, int width, int height, const char* titl
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window->glfw_window);
+    glfwSetWindowSizeCallback(window->glfw_window, &window_size_callback);
 
     // WARNING
     // C'est la partie sombre ou on charge le carré dans la mémoire de la carte graphique
@@ -87,6 +93,24 @@ int game_window_init(GameWindow* window, int width, int height, const char* titl
     glUseProgram(shader_id);
 
     return 1;
+}
+
+int game_window_is_opened(GameWindow* window)
+{
+    return !glfwWindowShouldClose(window->glfw_window);
+}
+
+void game_window_clear(GameWindow* window)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void game_window_update(GameWindow* window)
+{
+    /* Swap front and back buffers */
+    glfwSwapBuffers(window->glfw_window);
+    /* Poll for and process events */
+    glfwPollEvents();
 }
 
 void game_window_free(GameWindow* window)
