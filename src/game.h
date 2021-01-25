@@ -17,8 +17,6 @@ typedef struct
 
 } Square;
 
-void square_draw(Square* square, GameWindow* game_window);
-
 typedef struct
 {
     InputState input;
@@ -30,6 +28,9 @@ typedef struct
     int board[GRID_SIZE][GRID_SIZE];
  
 } Game;
+
+void square_draw(Square* square, GameWindow* game_window);
+Square empty_square(int x, int y);
 
 void game_init(GameWindow* game_window, Game* game);
 void game_update(GameWindow* game_window, Game* game);
