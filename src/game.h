@@ -22,3 +22,6 @@ void game_init(GameWindow* game_window, Game* game);
 void game_update(GameWindow* game_window, Game* game);
 void game_draw(GameWindow* game_window, Game* game);
 void game_free(Game* game);
+
+void game_add_ennemy(Game* game, Square ennemy);
+void game_move_square(Game* game, Square* square, SquareType type);

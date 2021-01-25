@@ -10,82 +10,68 @@ void game_init(GameWindow* game_window, Game* game)
 {
     input_state_set_window(&game->input, game_window->glfw_window);
  
-    game->player.x = 0;
-    game->player.y = 0;
-    game->player.size = 1;
-    game->player.color = color_white; 
+    game->player = square_create(0, 0, 1, color_white, 0, 0);
+
     game->size_x = GRID_SIZE;
     game->size_y = GRID_SIZE;
 
-    // - Init Board
-    for(int i=0; i<game->size_x; i++)
+    // Init grid
+    for (int i=0; i<game->size_x; i++)
     {
-        for(int j=0; j<game->size_y; j++)
+        for (int j=0; j<game->size_y; j++)
             game->grid[i][j] = NOTHING; 
     }
 
     vector_init(&game->ennemies, 10);
 
-    Square ennemy; 
-    ennemy.x = 2;
-    ennemy.y = 2; 
-    ennemy.size = 1;
-    ennemy.color = color_red; 
-    ennemy.direction_x = 1;
-    ennemy.direction_y = 0;
-
-    vector_push(&game->ennemies, ennemy);
-
-    game->grid[ennemy.x][ennemy.y] = ENNEMY; 
+    game_add_ennemy(game, square_create(15, 5, 1, color_red, -1, 0));
+    game_add_ennemy(game, square_create(15, 5, 1, color_red, 1, 1));
+    game_add_ennemy(game, square_create(10, 10, 1, color_red, 0, -1));
 }
 
 void game_update(GameWindow* game_window, Game* game)
 {
     input_state_update(&game->input);
 
-    int moved = 0; 
+    int moved = 0;
+    game->player.direction_x = 0;
+    game->player.direction_y = 0;
 
     if (is_key_released(&game->input, GLFW_KEY_RIGHT))
     {
-        game->grid[game->player.x][game->player.y] = -1; 
-        game->player.x += 1;
-        moved = 1; 
+        game->player.direction_x = 1;
     }
-    if (is_key_released(&game->input, GLFW_KEY_LEFT))
+    else if (is_key_released(&game->input, GLFW_KEY_LEFT))
     {
-        game->grid[game->player.x][game->player.y] = -1;
-        game->player.x -= 1;
-        moved = 1; 
+        game->player.direction_x = -1; 
     }
-    if (is_key_released(&game->input, GLFW_KEY_UP))
+    else if (is_key_released(&game->input, GLFW_KEY_UP))
     {
-        game->grid[game->player.x][game->player.y] = -1;
-        game->player.y -= 1;
-        moved = 1; 
+        game->player.direction_y = -1;
     }
-    if (is_key_released(&game->input, GLFW_KEY_DOWN))
+    else if (is_key_released(&game->input, GLFW_KEY_DOWN))
     {
-        game->grid[game->player.x][game->player.y] = -1;
-        game->player.y += 1;
-        moved = 1; 
+        game->player.direction_y = 1;
     }
 
-    game->grid[game->player.x][game->player.y] = 1;
+    if (game->player.direction_x != 0 || game->player.direction_y != 0)
+    {
+        game_move_square(game, &game->player, PLAYER);
+        moved = 1; 
+    }
 
     //TODO Fonction qui check si y'avait pas déjà quelque chose =>>> Mort du player
 
     if (moved)
     {
-        // Others squares
         Square* ennemies = vector_at(&game->ennemies, 0);
         for (Square* ennemy=ennemies; ennemy != ennemies + vector_size(&game->ennemies); ennemy++)
         {
-            game->grid[ennemy->x][ennemy->y] = NOTHING;
+            int next_pos_x = ennemy->x + ennemy->direction_x;
+            int next_pos_y = ennemy->y + ennemy->direction_y;
 
-            ennemy->x += ennemy->direction_x;
-            ennemy->y += ennemy->direction_y; 
-
-            game->grid[ennemy->x][ennemy->y] = ENNEMY;
+            if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
+                game_move_square(game, ennemy, ENNEMY);
         }
     }
 }
@@ -103,4 +89,20 @@ void game_draw(GameWindow* game_window, Game* game)
 void game_free(Game* game)
 {
     vector_free(&game->ennemies);
+}
+
+void game_add_ennemy(Game* game, Square ennemy)
+{
+    vector_push(&game->ennemies, ennemy);
+    game->grid[ennemy.x][ennemy.y] = ENNEMY; 
+}
+
+void game_move_square(Game* game, Square* square, SquareType type)
+{
+    game->grid[square->x][square->y] = NOTHING;
+
+    square->x += square->direction_x;
+    square->y += square->direction_y;
+
+    game->grid[square->x][square->y] = type;
 }
