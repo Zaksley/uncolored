@@ -33,6 +33,9 @@ void game_update(GameWindow* game_window, Game* game)
 {
     input_state_update(&game->input);
 
+    if (!game->player.alive)
+        return;
+
     int moved = 0;
     game->player.direction_x = 0;
     game->player.direction_y = 0;
@@ -65,25 +68,29 @@ void game_update(GameWindow* game_window, Game* game)
     if (moved)
     {
         Square* ennemies = vector_at(&game->ennemies, 0);
-        for (Square* ennemy=ennemies; ennemy != ennemies + vector_size(&game->ennemies); ennemy++)
+        size_t ennemy_count = vector_size(&game->ennemies);
+        for (Square* ennemy=ennemies; ennemy != ennemies + ennemy_count; ennemy++)
         {
             int next_pos_x = ennemy->x + ennemy->direction_x;
             int next_pos_y = ennemy->y + ennemy->direction_y;
 
             if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
                 game_move_square(game, ennemy, ENNEMY);
+
+            if (square_overlap(ennemy, &game->player))
+                game->player.alive = 0;
         }
     }
 }
 
 void game_draw(GameWindow* game_window, Game* game)
 {
-    // Draw player
-    square_draw(&game->player, game_window);
-
     // Draw first ennemis
     for (size_t i=0; i<vector_size(&game->ennemies); i++)
         square_draw(vector_at(&game->ennemies, i), game_window); 
+
+    // Draw player
+    square_draw(&game->player, game_window);
 }
 
 void game_free(Game* game)

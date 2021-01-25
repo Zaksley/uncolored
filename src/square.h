@@ -20,7 +20,10 @@ typedef struct
 
     int direction_x;
     int direction_y;
+
+    int alive;
 } Square;
 
 Square square_create(int x, int y, int size, Color color, int direction_x, int direction_y);
+int square_overlap(Square* s1, Square* s2);
 void square_draw(Square* square, GameWindow* game_window);
