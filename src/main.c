@@ -20,6 +20,7 @@ int main(int argc, char const *argv[])
         game_window_update(&window);
     }
 
+    game_free(&game);
     game_window_free(&window);
 
     return 0;

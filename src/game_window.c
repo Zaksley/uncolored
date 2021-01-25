@@ -27,7 +27,7 @@ int game_window_init(GameWindow* window, int width, int height, const char* titl
     if (!glfwInit())
         return 0;
 
-    glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
+    //glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // On veut OpenGL 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Pour rendre MacOS heureux ; ne devrait pas être nécessaire
