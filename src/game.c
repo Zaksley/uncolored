@@ -123,30 +123,28 @@ void game_generator(Game *game)
         //Creation basic ennemy
     if (game->turn % 3 == 0)
     { 
-        /*
-        
         int split = rand() % 4; 
-        int x, y, direction_x, direction_y = 0; 
+        int x = 0, y = 0, direction_x = 0, direction_y = 0; 
         switch(split)
         {
                 //Left
             case 0:
                 x = 0;
-                y = rand() % GRID_SIZE; 
+                y = rand() % (GRID_SIZE-1); 
                 direction_x = 1;
                 break;
 
                 //Right
             case 1:
                 x = GRID_SIZE;
-                y = rand() % GRID_SIZE; 
+                y = rand() % (GRID_SIZE-1); 
                 direction_x = -1; 
 
                 break;
 
                 //Top
             case 2:
-                x = rand() % GRID_SIZE;
+                x = rand() % (GRID_SIZE-1);
                 y = 0; 
                 direction_y = 1; 
 
@@ -154,7 +152,7 @@ void game_generator(Game *game)
 
                 //Bottom 
             case 3:
-                x = rand() % GRID_SIZE;
+                x = rand() % (GRID_SIZE-1);
                 y = GRID_SIZE-1; 
                 direction_y = -1; 
 
@@ -163,8 +161,5 @@ void game_generator(Game *game)
         
 
         game_add_ennemy(game, square_create(x, y, 1, color_violet, direction_x, direction_y));
-        */
-        
-        game_add_ennemy(game, square_create(2, 2, 1, color_violet, 1, 0));
     }
 }
