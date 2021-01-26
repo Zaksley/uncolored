@@ -9,8 +9,6 @@
 typedef struct
 {
     InputState input;
-    int size_x;
-    int size_y;
 
     int turn;  
     Square player;
@@ -25,5 +23,8 @@ void game_draw(GameWindow* game_window, Game* game);
 void game_free(Game* game);
 
 void game_add_ennemy(Game* game, Square ennemy);
+void game_update_ennemy(Game* game, Square* ennemy);
+void game_check_ennemies_death(Game* game);
+void game_remove_enemy(Game* game, size_t index);
 void game_move_square(Game* game, Square* square, SquareType type);
 void game_generator(Game* game); 

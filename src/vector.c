@@ -53,16 +53,17 @@ int vector_remove(vector* vector, size_t i)
     if (vector_is_empty(vector) || i >= vector->size)
         return 0;
 
-    if (i < vector->size-1)
+    else if (i < vector->size-1 && vector->size != 1)
     {
         for (size_t j=i+1; j<vector->size; ++j)
-            vector->items[i-1] = vector->items[i];
+            vector->items[j-1] = vector->items[j];
     }
 
     --vector->size;
 
-    if (vector->size < vector->capacity / 2)
-        _vector_resize(vector, vector->capacity / 2);
+    size_t new_size = vector->capacity / 2;
+    if (vector->size < new_size)
+        _vector_resize(vector, new_size);
         
     return 1;
 }
