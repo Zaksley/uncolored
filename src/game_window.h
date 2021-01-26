@@ -2,6 +2,7 @@
 
 #include "shader.h"
 #include <GLFW/glfw3.h>
+#include <time.h>
 
 typedef struct
 {

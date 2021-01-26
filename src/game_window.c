@@ -134,6 +134,7 @@ void game_window_draw_rectangle(GameWindow* window, float x, float y, float widt
         1.f
     };
 
+    glProgramUniform1f(window->shader_id, glGetUniformLocation(window->shader_id, "time"), (float)clock());
     glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "position"), gl_pos[0], gl_pos[1], gl_pos[2]);
     glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "size"), gl_size[0], gl_size[1], gl_size[2]);
     glProgramUniform4f(window->shader_id, glGetUniformLocation(window->shader_id, "color"), color.r, color.g, color.b, color.a);
