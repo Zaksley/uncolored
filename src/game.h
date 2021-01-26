@@ -4,7 +4,7 @@
 #include "input.h"
 #include "vector.h"
 
-#define GRID_SIZE 100
+#define GRID_SIZE 20
 
 typedef struct
 {
@@ -12,6 +12,7 @@ typedef struct
     int size_x;
     int size_y;
 
+    int turn;  
     Square player;
     vector ennemies;
 
@@ -25,3 +26,4 @@ void game_free(Game* game);
 
 void game_add_ennemy(Game* game, Square ennemy);
 void game_move_square(Game* game, Square* square, SquareType type);
+void game_generator(Game* game); 
