@@ -7,13 +7,43 @@ const float square_vertices[] =
 {
     // Triangle 1
     -0.5f,  0.5f, 0.f, // top left
+     0.0f,  0.5f, 0.f, // top right
+    -0.5f,  0.0f, 0.f, // bottom left
+
+    // Triangle 2
+     0.0f,  0.5f, 0.f, // bottom left
+    -0.5f,  0.0f, 0.f, // top right
+     0.0f,  0.0f, 0.f,  // bottom right 
+
+    // Triangle 1
+     0.0f,  0.5f, 0.f, // top left
      0.5f,  0.5f, 0.f, // top right
+     0.0f,  0.0f, 0.f, // bottom left
+
+    // Triangle 2
+     0.5f,  0.5f, 0.f, // bottom left
+     0.0f,  0.0f, 0.f, // top right
+     0.5f,  0.0f, 0.f,  // bottom right 
+
+    // Triangle 1
+    -0.5f,  0.0f, 0.f, // top left
+     0.0f,  0.0f, 0.f, // top right
     -0.5f, -0.5f, 0.f, // bottom left
 
     // Triangle 2
-    -0.5f, -0.5f, 0.f, // bottom left
-     0.5f,  0.5f, 0.f, // top right
-     0.5f, -0.5f, 0.f  // bottom right 
+     0.0f,  0.0f, 0.f, // bottom left
+    -0.5f, -0.5f, 0.f, // top right
+     0.0f, -0.5f, 0.f,  // bottom right 
+
+    // Triangle 1
+     0.0f,  0.0f, 0.f, // top left
+     0.5f,  0.0f, 0.f, // top right
+     0.0f, -0.5f, 0.f, // bottom left
+
+    // Triangle 2
+     0.5f,  0.0f, 0.f, // bottom left
+     0.0f, -0.5f, 0.f, // top right
+     0.5f, -0.5f, 0.f,  // bottom right 
 };
 
 void window_size_callback(GLFWwindow* window, int width, int height)
@@ -27,7 +57,7 @@ int game_window_init(GameWindow* window, int width, int height, const char* titl
     if (!glfwInit())
         return 0;
 
-    //glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
+    glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // On veut OpenGL 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Pour rendre MacOS heureux ; ne devrait pas être nécessaire
@@ -138,5 +168,5 @@ void game_window_draw_rectangle(GameWindow* window, float x, float y, float widt
     glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "position"), gl_pos[0], gl_pos[1], gl_pos[2]);
     glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "size"), gl_size[0], gl_size[1], gl_size[2]);
     glProgramUniform4f(window->shader_id, glGetUniformLocation(window->shader_id, "color"), color.r, color.g, color.b, color.a);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, sizeof(square_vertices)/sizeof(square_vertices[0])/3);
 }
