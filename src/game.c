@@ -1,6 +1,7 @@
 #include "game.h"
 
 Color color_red = {1.0, 0.0, 0.0, 1.0};
+Color color_orange = {1.0, 0.33, 0.0, 1.0}; 
 Color color_white = {1.0, 1.0, 1.0, 1.0};
 Color color_blue = {0.0, 0.0, 1.0, 1.0};
 Color color_green = {0.0, 1.0, 0.0, 1.0};
@@ -62,8 +63,8 @@ void game_update(GameWindow* game_window, Game* game)
         game_generator(game);
         moved = 1;
 
-        printf("player: pos (%d, %d), size (%d, %d)\n", game->player.x, game->player.y, game->player.size, game->player.size);
-        printf("ennmies: size (%lu)\n", vector_size(&game->ennemies));
+        //printf("player: pos (%d, %d), size (%d, %d)\n", game->player.x, game->player.y, game->player.size, game->player.size);
+        //printf("ennmies: size (%lu)\n", vector_size(&game->ennemies));
     }
 
     if (moved)
@@ -105,6 +106,11 @@ void game_update_ennemy(Game* game, Square* ennemy)
 
     if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
         game_move_square(game, ennemy, ENNEMY);
+    //TODO Gérez collisions ennemis 
+    else
+    {
+
+    }
 
     if (square_overlap(ennemy, &game->player))
         game->player.alive = 0;
@@ -150,13 +156,15 @@ void game_move_square(Game* game, Square* square, SquareType type)
     game->grid[square->x][square->y] = type;
 }
 
-void game_generator(Game *game)
+void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x[], int dire_y[])
 {
-    //Creation basic ennemy
-    if (game->turn % 3 == 0)
+        //Creation basic ennemy
+    if (game->turn % frequence == 0)
     { 
         int side = rand() % 4; 
-        int x = 0, y = 0, direction_x = 0, direction_y = 0; 
+        int x = 0, y = 0;
+        int direction_x = dire_x[side];
+        int direction_y = dire_y[side]; 
 
         switch (side)
         {
@@ -164,14 +172,12 @@ void game_generator(Game *game)
             case 0:
                 x = 0;
                 y = rand() % GRID_SIZE; 
-                direction_x = 1;
                 break;
 
             //Right
             case 1:
                 x = GRID_SIZE-1;
                 y = rand() % GRID_SIZE; 
-                direction_x = -1; 
 
                 break;
 
@@ -179,7 +185,6 @@ void game_generator(Game *game)
             case 2:
                 x = rand() % GRID_SIZE;
                 y = 0; 
-                direction_y = 1; 
 
                 break;
 
@@ -187,11 +192,29 @@ void game_generator(Game *game)
             case 3:
                 x = rand() % GRID_SIZE;
                 y = GRID_SIZE-1; 
-                direction_y = -1; 
 
                 break;
         }
         
-        game_add_ennemy(game, square_create(x, y, 1, color_violet, direction_x, direction_y));
+        game_add_ennemy(game, square_create(x, y, 1, color, direction_x, direction_y));
     }
+}
+
+
+void game_generator(Game *game)
+{
+
+    int dire_x[4] = {1, -1, 0, 0};
+    int dire_y[4] = {0, 0, 1, -1}; 
+    game_create_ennemy(game, color_red, RED, dire_x, dire_y); 
+
+    int fast_x[4] = {2, -2, 0, 0};
+    int fast_y[4] = {0, 0, 2, -2}; 
+    game_create_ennemy(game, color_orange, RED, fast_x, fast_y); 
+    
+    int deso_pj_x[4] = {1, -1, 1, -1};
+    int deso_pj_y[4] = {1, -1, 1, -1};
+
+    game_create_ennemy(game, color_violet, VIOLET, deso_pj_x, deso_pj_y);
+
 }

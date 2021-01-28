@@ -12,6 +12,12 @@ typedef enum
     WEIRD_SQUARE
 } SquareType;
 
+typedef enum
+{
+    RED = 3,
+    VIOLET = 4,
+} Frequency; 
+
 typedef struct
 {
     int x, y;

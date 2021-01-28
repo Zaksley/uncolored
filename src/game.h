@@ -28,3 +28,4 @@ void game_check_ennemies_death(Game* game);
 void game_remove_enemy(Game* game, size_t index);
 void game_move_square(Game* game, Square* square, SquareType type);
 void game_generator(Game* game); 
+void game_create_ennemy(Game* game, Color color, Frequency frequence, int dire_x[], int dire_y[]); 
