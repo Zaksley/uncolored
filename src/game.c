@@ -101,6 +101,10 @@ void game_add_ennemy(Game* game, Square ennemy)
 
 void game_update_ennemy(Game* game, Square* ennemy)
 {
+        // Kill player before moving
+    if (square_overlap(ennemy, &game->player))
+        game->player.alive = 0;
+
     int next_pos_x = ennemy->x + ennemy->direction_x;
     int next_pos_y = ennemy->y + ennemy->direction_y;
 
@@ -109,9 +113,10 @@ void game_update_ennemy(Game* game, Square* ennemy)
     //TODO Gérez collisions ennemis 
     else
     {
-
+        ennemy->alive = 0;
     }
 
+        // Kill player after moving 
     if (square_overlap(ennemy, &game->player))
         game->player.alive = 0;
 }
