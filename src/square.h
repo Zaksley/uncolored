@@ -35,4 +35,4 @@ Square square_create(int x, int y, int size, Color color, int direction_x, int d
 //Checking collision between 2 squares
 int square_overlap(Square* s1, Square* s2);
 //Drawing square
-void square_draw(Square* square, GameWindow* game_window);
+void square_draw(Square* square, GameWindow* game_window, Effect effect);

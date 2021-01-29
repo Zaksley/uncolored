@@ -59,6 +59,10 @@ int game_window_init(GameWindow* window, int width, int height, const char* titl
         return 0;
     }
 
+    // GL config
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
     GLuint square_vao;
     glGenVertexArrays(1, &square_vao);
     glBindVertexArray(square_vao);
@@ -102,7 +106,7 @@ int game_window_is_opened(GameWindow* window)
 
 void game_window_clear(GameWindow* window)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void game_window_update(GameWindow* window)
@@ -118,12 +122,12 @@ void game_window_free(GameWindow* window)
     glfwTerminate();
 }
 
-void game_window_draw_rectangle(GameWindow* window, float x, float y, float width, float height, Color color)
+void game_window_draw_rectangle(GameWindow* window, float x, float y, float width, float height, Color color, Effect effect)
 {
     float gl_pos[3] =
     {
         -1.f + x * 2.f/window->width,
-        1.f - y * 2.f/window->height,
+         1.f - y * 2.f/window->height,
          0.f
     };
 
@@ -134,9 +138,18 @@ void game_window_draw_rectangle(GameWindow* window, float x, float y, float widt
         1.f
     };
 
+    glProgramUniform1i(window->shader_id, glGetUniformLocation(window->shader_id, "shake"), effect.shake);
+    glProgramUniform1i(window->shader_id, glGetUniformLocation(window->shader_id, "fade"), effect.fade);
+    glProgramUniform2f(window->shader_id, glGetUniformLocation(window->shader_id, "direction"), effect.dir_x, effect.dir_y);
     glProgramUniform1f(window->shader_id, glGetUniformLocation(window->shader_id, "time"), (float)clock());
     glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "position"), gl_pos[0], gl_pos[1], gl_pos[2]);
     glProgramUniform3f(window->shader_id, glGetUniformLocation(window->shader_id, "size"), gl_size[0], gl_size[1], gl_size[2]);
     glProgramUniform4f(window->shader_id, glGetUniformLocation(window->shader_id, "color"), color.r, color.g, color.b, color.a);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+Effect no_effect()
+{
+    Effect effect = {0, 0, 0, 0};
+    return effect;
 }

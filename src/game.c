@@ -62,9 +62,6 @@ void game_update(GameWindow* game_window, Game* game)
         game->turn++;
         game_generator(game);
         moved = 1;
-
-        //printf("player: pos (%d, %d), size (%d, %d)\n", game->player.x, game->player.y, game->player.size, game->player.size);
-        //printf("ennmies: size (%lu)\n", vector_size(&game->ennemies));
     }
 
     if (moved)
@@ -80,12 +77,14 @@ void game_update(GameWindow* game_window, Game* game)
 
 void game_draw(GameWindow* game_window, Game* game)
 {
+    Effect effect = no_effect();
+
     // Draw first ennemis
     for (size_t i=0; i<vector_size(&game->ennemies); i++)
-        square_draw(vector_at(&game->ennemies, i), game_window);
+        square_draw(vector_at(&game->ennemies, i), game_window, effect);
 
     // Draw player
-    square_draw(&game->player, game_window);
+    square_draw(&game->player, game_window, effect);
 }
 
 void game_free(Game* game)
@@ -208,7 +207,6 @@ void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x
 
 void game_generator(Game *game)
 {
-
     int dire_x[4] = {1, -1, 0, 0};
     int dire_y[4] = {0, 0, 1, -1}; 
     game_create_ennemy(game, color_red, RED, dire_x, dire_y); 
@@ -221,5 +219,4 @@ void game_generator(Game *game)
     int deso_pj_y[4] = {1, -1, 1, -1};
 
     game_create_ennemy(game, color_violet, VIOLET, deso_pj_x, deso_pj_y);
-
 }
