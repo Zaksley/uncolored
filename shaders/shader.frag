@@ -11,13 +11,17 @@ out vec4 frag_color;
 void main()
 {
     float alpha = 0.0;
+    float x_alpha = direction.x * vertPos.x + 0.5;
+    float y_alpha = 0.5 - direction.y * vertPos.y;
 
     if (fade)
     {
-        if (direction.x != 0.0)
-            alpha += direction.x * (vertPos.x + 0.5); 
-        if (direction.y != 0.0)
-            alpha += direction.y * (0.5 - vertPos.y);
+        if (direction.x != 0.0 && direction.y != 0.0)
+            alpha = x_alpha + y_alpha;
+        else if (direction.x != 0.0)
+            alpha = x_alpha; 
+        else if (direction.y != 0.0)
+            alpha = y_alpha;
     }
     else alpha = color.a;
 

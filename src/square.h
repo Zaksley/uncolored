@@ -3,6 +3,8 @@
 #include "game_window.h"
 
 #define SIZE_SQUARE 32
+#define SLIDE_TIME 1.f
+#define MOVE_AMOUNT 0.1f
 
 typedef enum
 {
@@ -28,6 +30,9 @@ typedef struct
     int direction_y;
 
     int alive;
+    int moving;
+    float move_timer;
+    float move_x, move_y;
 } Square;
 
 //Create a square

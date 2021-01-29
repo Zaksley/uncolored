@@ -11,6 +11,7 @@ typedef struct
 
 typedef struct
 {
+    float dt;
     int width, height;
     GLuint shader_id;
     GLFWwindow* glfw_window;

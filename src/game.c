@@ -36,42 +36,60 @@ void game_update(GameWindow* game_window, Game* game)
         return;
 
     int moved = 0;
-    game->player.direction_x = 0;
-    game->player.direction_y = 0;
+    int direction_x = 0;
+    int direction_y = 0;
 
     if (is_key_released(&game->input, GLFW_KEY_RIGHT))
     {
-        game->player.direction_x = 1;
+        direction_x = 1;
     }
     else if (is_key_released(&game->input, GLFW_KEY_LEFT))
     {
-        game->player.direction_x = -1;
+        direction_x = -1;
     }
     else if (is_key_released(&game->input, GLFW_KEY_UP))
     {
-        game->player.direction_y = -1;
+        direction_y = -1;
     }
     else if (is_key_released(&game->input, GLFW_KEY_DOWN))
     {
-        game->player.direction_y = 1;
+        direction_y = 1;
     }
 
-    if (game->player.direction_x != 0 || game->player.direction_y != 0)
+    if (!game->player.moving)
     {
-        game_move_square(game, &game->player, PLAYER);
-        game->turn++;
-        game_generator(game);
-        moved = 1;
+        game->player.direction_x = direction_x;
+        game->player.direction_y = direction_y;
+    }
+
+    if (game->player.direction_x != 0 || game->player.direction_y != 0 || game->player.moving)
+    {
+        game->player.move_timer += MOVE_AMOUNT;
+        game->player.move_x += game->player.direction_x * SIZE_SQUARE * (MOVE_AMOUNT/SLIDE_TIME) * game_window->dt;
+        game->player.move_y += game->player.direction_y * SIZE_SQUARE * (MOVE_AMOUNT/SLIDE_TIME) * game_window->dt;
+
+        if (game->player.move_timer >= SLIDE_TIME)
+        {
+            game->player.move_timer = 0.f;
+            game->player.moving = 0;
+
+            game_move_square(game, &game->player, PLAYER);
+            moved = 1;
+        }
+        else game->player.moving = 1;
     }
 
     if (moved)
     {
+        game_generator(game);
+
         Square* ennemies = vector_at(&game->ennemies, 0);
         size_t ennemy_count = vector_size(&game->ennemies);
         for (Square* ennemy=ennemies; ennemy != ennemies + ennemy_count; ennemy++)
             game_update_ennemy(game, ennemy);
 
         game_check_ennemies_death(game);
+        game->turn++;
     }
 }
 
@@ -84,6 +102,12 @@ void game_draw(GameWindow* game_window, Game* game)
         square_draw(vector_at(&game->ennemies, i), game_window, effect);
 
     // Draw player
+    if (game->player.moving)
+    {
+        effect.fade = 1;
+        effect.dir_x = (float)game->player.direction_x;
+        effect.dir_y = (float)game->player.direction_y;
+    }
     square_draw(&game->player, game_window, effect);
 }
 
@@ -155,7 +179,9 @@ void game_move_square(Game* game, Square* square, SquareType type)
     game->grid[square->x][square->y] = NOTHING;
 
     square->x = next_pos_x;
+    square->move_x = next_pos_x;
     square->y = next_pos_y;
+    square->move_y = next_pos_y;
 
     game->grid[square->x][square->y] = type;
 }
