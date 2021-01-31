@@ -13,6 +13,7 @@ void game_init(GameWindow* game_window, Game* game)
 
     game->player = square_create(0, 0, 1, color_white, 0, 0);
     game->turn = 0;
+    game->ennemies_updated = 1;
 
     // Init grid
     for (int i=0; i<GRID_SIZE; i++)
@@ -23,7 +24,7 @@ void game_init(GameWindow* game_window, Game* game)
 
     vector_init(&game->ennemies, 10);
 
-    game_add_ennemy(game, square_create(15, 5, 1, color_red, -1, 0));
+    game_add_ennemy(game, square_create(15, 7, 1, color_red, -1, 0));
     game_add_ennemy(game, square_create(15, 5, 1, color_red, 1, 1));
     game_add_ennemy(game, square_create(10, 10, 1, color_red, 0, -1));
 }
@@ -62,18 +63,40 @@ void game_update(GameWindow* game_window, Game* game)
     }
 
     int moved = 0;
-    if (game->player.direction_x != 0 || game->player.direction_y != 0 || game->player.moving)
+    if ((game->player.direction_x != 0 || game->player.direction_y != 0 || game->player.moving)
+        && game->ennemies_updated)
         moved = game_slide_square(game, &game->player, PLAYER, game_window->dt);
 
     if (moved)
     {
         game_generator(game);
+        game->ennemies_updated = 0;
+
+        // Everybody start moving
+        Square* ennemies = vector_at(&game->ennemies, 0);
+        size_t ennemy_count = vector_size(&game->ennemies);
+        for (Square* ennemy=ennemies; ennemy != ennemies + ennemy_count; ennemy++)
+        {
+            ennemy->moving = 1;
+        }
+    }
+
+    if (!game->ennemies_updated)
+    {
+        int updated = 1;
 
         Square* ennemies = vector_at(&game->ennemies, 0);
         size_t ennemy_count = vector_size(&game->ennemies);
         for (Square* ennemy=ennemies; ennemy != ennemies + ennemy_count; ennemy++)
-            game_update_ennemy(game, ennemy);
+        {
+            if (ennemy->moving && !game_update_ennemy(game, ennemy, game_window->dt))
+                updated = 0;
+        }
 
+        game->ennemies_updated = updated;
+    }
+    else
+    {
         game_check_ennemies_death(game);
         game->turn++;
     }
@@ -83,17 +106,30 @@ void game_draw(GameWindow* game_window, Game* game)
 {
     Effect effect = no_effect();
 
+    if (!game->player.moving)
+        effect.shake = 1;
+
     // Draw first ennemis
     for (size_t i=0; i<vector_size(&game->ennemies); i++)
-        square_draw(vector_at(&game->ennemies, i), game_window, effect);
-
+    {
+        Square* ennemy = vector_at(&game->ennemies, i);
+        effect.fade = ennemy->moving;
+        effect.dir_x = (float)ennemy->direction_x;
+        effect.dir_y = (float)ennemy->direction_y;
+        square_draw(ennemy, game_window, effect);
+    }
+        
     // Draw player
+    effect = no_effect();
+
     if (game->player.moving)
     {
         effect.fade = 1;
         effect.dir_x = (float)game->player.direction_x;
         effect.dir_y = (float)game->player.direction_y;
     }
+    else effect.shake = 1;
+
     square_draw(&game->player, game_window, effect);
 }
 
@@ -108,26 +144,30 @@ void game_add_ennemy(Game* game, Square ennemy)
     game->grid[ennemy.x][ennemy.y] = ENNEMY;
 }
 
-void game_update_ennemy(Game* game, Square* ennemy)
+int game_update_ennemy(Game* game, Square* ennemy, float dt)
 {
         // Kill player before moving
     if (square_overlap(ennemy, &game->player))
         game->player.alive = 0;
 
+    int moved = 0;
     int next_pos_x = ennemy->x + ennemy->direction_x;
     int next_pos_y = ennemy->y + ennemy->direction_y;
 
     if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
-        game_move_square(game, ennemy, ENNEMY);
+        moved = game_slide_square(game, ennemy, ENNEMY, dt);
     //TODO Gérez collisions ennemis 
     else
     {
         ennemy->alive = 0;
+        return 1;
     }
 
         // Kill player after moving 
     if (square_overlap(ennemy, &game->player))
         game->player.alive = 0;
+
+    return moved;
 }
 
 void game_check_ennemies_death(Game* game)

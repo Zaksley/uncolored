@@ -12,6 +12,8 @@ typedef struct
 
     int turn;  
     Square player;
+
+    int ennemies_updated;
     vector ennemies;
 
     int grid[GRID_SIZE][GRID_SIZE];
@@ -23,7 +25,7 @@ void game_draw(GameWindow* game_window, Game* game);
 void game_free(Game* game);
 
 void game_add_ennemy(Game* game, Square ennemy);
-void game_update_ennemy(Game* game, Square* ennemy);
+int game_update_ennemy(Game* game, Square* ennemy, float dt);
 void game_check_ennemies_death(Game* game);
 void game_remove_enemy(Game* game, size_t index);
 int game_slide_square(Game* game, Square* square, SquareType type, float dt);
