@@ -3,7 +3,7 @@
 #include "game_window.h"
 
 #define SIZE_SQUARE 32
-#define SLIDE_TIME 1.f
+#define SLIDE_TIME 1.5f
 #define MOVE_AMOUNT 0.1f
 
 typedef enum
