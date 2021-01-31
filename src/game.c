@@ -35,7 +35,6 @@ void game_update(GameWindow* game_window, Game* game)
     if (!game->player.alive)
         return;
 
-    int moved = 0;
     int direction_x = 0;
     int direction_y = 0;
 
@@ -62,22 +61,9 @@ void game_update(GameWindow* game_window, Game* game)
         game->player.direction_y = direction_y;
     }
 
+    int moved = 0;
     if (game->player.direction_x != 0 || game->player.direction_y != 0 || game->player.moving)
-    {
-        game->player.move_timer += MOVE_AMOUNT;
-        game->player.move_x += game->player.direction_x * SIZE_SQUARE * (MOVE_AMOUNT/SLIDE_TIME) * game_window->dt;
-        game->player.move_y += game->player.direction_y * SIZE_SQUARE * (MOVE_AMOUNT/SLIDE_TIME) * game_window->dt;
-
-        if (game->player.move_timer >= SLIDE_TIME)
-        {
-            game->player.move_timer = 0.f;
-            game->player.moving = 0;
-
-            game_move_square(game, &game->player, PLAYER);
-            moved = 1;
-        }
-        else game->player.moving = 1;
-    }
+        moved = game_slide_square(game, &game->player, PLAYER, game_window->dt);
 
     if (moved)
     {
@@ -162,6 +148,24 @@ void game_remove_enemy(Game* game, size_t index)
     Square* ennemy = vector_at(&game->ennemies, index); 
     game->grid[ennemy->x][ennemy->y] = NOTHING;
     vector_remove(&game->ennemies, index);
+}
+
+int game_slide_square(Game* game, Square* square, SquareType type, float dt)
+{
+    square->move_timer += MOVE_AMOUNT;
+    square->move_x += square->direction_x * SIZE_SQUARE * (MOVE_AMOUNT/SLIDE_TIME) * dt;
+    square->move_y += square->direction_y * SIZE_SQUARE * (MOVE_AMOUNT/SLIDE_TIME) * dt;
+
+    if (square->move_timer >= SLIDE_TIME)
+    {
+        square->move_timer = 0.f;
+        square->moving = 0;
+
+        game_move_square(game, square, type);
+    }
+    else square->moving = 1;
+
+    return !square->moving;
 }
 
 void game_move_square(Game* game, Square* square, SquareType type)

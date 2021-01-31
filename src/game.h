@@ -26,6 +26,7 @@ void game_add_ennemy(Game* game, Square ennemy);
 void game_update_ennemy(Game* game, Square* ennemy);
 void game_check_ennemies_death(Game* game);
 void game_remove_enemy(Game* game, size_t index);
+int game_slide_square(Game* game, Square* square, SquareType type, float dt);
 void game_move_square(Game* game, Square* square, SquareType type);
 void game_generator(Game* game); 
 void game_create_ennemy(Game* game, Color color, Frequency frequence, int dire_x[], int dire_y[]); 
