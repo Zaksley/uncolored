@@ -16,8 +16,10 @@ typedef enum
 
 typedef enum
 {
-    RED = 3,
-    VIOLET = 4,
+    RED = 2,
+    VIOLET = 3,
+    ORANGE = 4,
+    ROSE = 5,
 } Frequency; 
 
 typedef struct

@@ -1,11 +1,12 @@
 #include "game.h"
 
 Color color_red = {1.0, 0.0, 0.0, 1.0};
+Color color_rose = {1.0, 0, 0.66, 1.0}; 
 Color color_orange = {1.0, 0.33, 0.0, 1.0}; 
 Color color_white = {1.0, 1.0, 1.0, 1.0};
 Color color_blue = {0.0, 0.0, 1.0, 1.0};
 Color color_green = {0.0, 1.0, 0.0, 1.0};
-Color color_violet = {0.75, 0.0, 0.75, 1.0};
+Color color_violet = {0.45, 0.0, 0.65, 1.0};
 
 void game_init(GameWindow* game_window, Game* game)
 {
@@ -277,16 +278,30 @@ void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x
 
 void game_generator(Game *game)
 {
-    int dire_x[4] = {1, -1, 0, 0};
-    int dire_y[4] = {0, 0, 1, -1}; 
-    game_create_ennemy(game, color_red, RED, dire_x, dire_y); 
+    int red_x[4] = {1, -1, 0, 0};
+    int red_y[4] = {0, 0, 1, -1}; 
+    game_create_ennemy(game, color_red, RED, red_x, red_y); 
 
-    int fast_x[4] = {2, -2, 0, 0};
-    int fast_y[4] = {0, 0, 2, -2}; 
-    game_create_ennemy(game, color_orange, RED, fast_x, fast_y); 
+    int orange_x[4] = {2, -2, 0, 0};
+    int orange_y[4] = {0, 0, 2, -2}; 
+    game_create_ennemy(game, color_orange, ORANGE, orange_x, orange_y); 
     
-    int deso_pj_x[4] = {1, -1, 1, -1};
-    int deso_pj_y[4] = {1, -1, 1, -1};
+    int violet_x[4] = {1, -1, 1, -1};
+    int violet_y[4] = {1, -1, 1, -1};
 
-    game_create_ennemy(game, color_violet, VIOLET, deso_pj_x, deso_pj_y);
+    game_create_ennemy(game, color_violet, VIOLET, violet_x, violet_y);
+
+    int rose_x[4] = {2, -2, -2, 2};
+    int rose_y[4] = {-2, 2, 2, -2}; 
+
+    game_create_ennemy(game, color_rose, ROSE, rose_x, rose_y); 
+
+
+        // Idée: Blue = square freeze, soit se déplace à moitié, soit gèle le player 
+    /*
+    int blue_x[4] = {0.5, -0.5, 0, 0}; 
+    int blue_y[4] = {0, 0, 0.5, -0.5}; 
+
+    game_create_ennemy(game, color_blue, RED, blue_x, blue_y); 
+    */
 }
