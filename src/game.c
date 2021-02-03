@@ -106,9 +106,18 @@ void game_update(GameWindow* game_window, Game* game)
 void game_draw(GameWindow* game_window, Game* game)
 {
     Effect effect = no_effect();
+    effect.shake = 1;
 
-    if (!game->player.moving)
-        effect.shake = 1;
+    game->shake_force += game_window->dt / 5.f;
+    effect.shake_force = game->shake_force * game->shake_force * game->shake_force * game->shake_force;
+    
+    if (game->player.moving)
+    {
+        game->shake_force -= game_window->dt;
+
+        if (game->shake_force <= 0.f)
+            game->shake_force = 0.f;
+    }
 
     // Draw first ennemis
     for (size_t i=0; i<vector_size(&game->ennemies); i++)
@@ -122,14 +131,22 @@ void game_draw(GameWindow* game_window, Game* game)
         
     // Draw player
     effect = no_effect();
+    effect.shake = 1;
+
+    game->shake_force += game_window->dt / 3.f;
+    effect.shake_force = game->shake_force * game->shake_force * game->shake_force * game->shake_force;
 
     if (game->player.moving)
     {
         effect.fade = 1;
         effect.dir_x = (float)game->player.direction_x;
         effect.dir_y = (float)game->player.direction_y;
+
+        game->shake_force -= game_window->dt;
+
+        if (game->shake_force <= 0.f)
+            game->shake_force = 0.f;
     }
-    else effect.shake = 1;
 
     square_draw(&game->player, game_window, effect);
 }

@@ -139,6 +139,7 @@ void game_window_draw_rectangle(GameWindow* window, float x, float y, float widt
     };
 
     glProgramUniform1i(window->shader_id, glGetUniformLocation(window->shader_id, "shake"), effect.shake);
+    glProgramUniform1f(window->shader_id, glGetUniformLocation(window->shader_id, "shake_force"), effect.shake_force);
     glProgramUniform1i(window->shader_id, glGetUniformLocation(window->shader_id, "fade"), effect.fade);
     glProgramUniform2f(window->shader_id, glGetUniformLocation(window->shader_id, "direction"), effect.dir_x, effect.dir_y);
     glProgramUniform1f(window->shader_id, glGetUniformLocation(window->shader_id, "time"), (float)glfwGetTime());
@@ -150,6 +151,6 @@ void game_window_draw_rectangle(GameWindow* window, float x, float y, float widt
 
 Effect no_effect()
 {
-    Effect effect = {0, 0, 0, 0};
+    Effect effect = {0, 0, 0, 0, 0};
     return effect;
 }

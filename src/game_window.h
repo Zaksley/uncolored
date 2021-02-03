@@ -21,6 +21,7 @@ typedef struct
 typedef struct
 {
     int shake;
+    float shake_force;
     int fade;
     float dir_x, dir_y;
 } Effect;

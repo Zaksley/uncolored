@@ -13,6 +13,8 @@ typedef struct
     int turn;  
     Square player;
 
+    float shake_force;
+
     int ennemies_updated;
     vector ennemies;
 
