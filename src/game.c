@@ -73,6 +73,7 @@ void game_update(GameWindow* game_window, Game* game)
 
     if (moved)
     {
+        game_check_ennemies_death(game);
         game_generator(game);
         game->ennemies_updated = 0;
         game->turn++;
@@ -99,10 +100,6 @@ void game_update(GameWindow* game_window, Game* game)
         }
 
         game->ennemies_updated = updated;
-    }
-    else
-    {
-        game_check_ennemies_death(game);
     }
 }
 
