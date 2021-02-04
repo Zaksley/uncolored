@@ -5,6 +5,7 @@
 #include "vector.h"
 
 #define GRID_SIZE 20
+#define COLORS 5
 
 typedef struct
 {
@@ -12,6 +13,9 @@ typedef struct
 
     int turn;  
     Square player;
+
+    int generation[COLORS];
+    int max_difficulty[COLORS];
 
     float shake_force;
 
@@ -28,6 +32,7 @@ void game_free(Game* game);
 
 void game_add_ennemy(Game* game, Square ennemy);
 int game_update_ennemy(Game* game, Square* ennemy, float dt);
+void game_update_spawning(Game* game, int generation[], int max_difficulty[]);
 void game_check_ennemies_death(Game* game);
 void game_remove_enemy(Game* game, size_t index);
 int game_slide_square(Game* game, Square* square, SquareType type, float dt);

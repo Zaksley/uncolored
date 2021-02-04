@@ -12,9 +12,15 @@ void game_init(GameWindow* game_window, Game* game)
 {
     input_state_set_window(&game->input, game_window->glfw_window);
 
-    game->player = square_create(0, 0, 1, color_white, 0, 0);
+    game->player = square_create(GRID_SIZE/2, GRID_SIZE/2, 1, color_white, 0, 0);
     game->turn = 0;
     game->ennemies_updated = 1;
+
+    int copy_generation[COLORS] = {2, 3, 4, 5, 6};
+    int copy_difficulty[COLORS] = {1, 1, 2, 2, 3}; 
+
+    memcpy(game->generation, copy_generation, sizeof(int) * COLORS);
+    memcpy(game->max_difficulty, copy_difficulty, sizeof(int) * COLORS);
 
     // Init grid
     for (int i=0; i<GRID_SIZE; i++)
@@ -25,9 +31,6 @@ void game_init(GameWindow* game_window, Game* game)
 
     vector_init(&game->ennemies, 10);
 
-    game_add_ennemy(game, square_create(15, 7, 1, color_red, -1, 0));
-    game_add_ennemy(game, square_create(15, 5, 1, color_red, 1, 1));
-    game_add_ennemy(game, square_create(10, 10, 1, color_red, 0, -1));
 }
 
 void game_update(GameWindow* game_window, Game* game)
@@ -72,6 +75,7 @@ void game_update(GameWindow* game_window, Game* game)
     {
         game_generator(game);
         game->ennemies_updated = 0;
+        game->turn++;
 
         // Everybody start moving
         Square* ennemies = vector_at(&game->ennemies, 0);
@@ -99,7 +103,6 @@ void game_update(GameWindow* game_window, Game* game)
     else
     {
         game_check_ennemies_death(game);
-        game->turn++;
     }
 }
 
@@ -288,30 +291,36 @@ void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x
                 break;
         }
         
-        game_add_ennemy(game, square_create(x, y, 1, color, direction_x, direction_y));
+        game_add_ennemy(game, square_create(x, y, 1, color,  direction_x, direction_y));
     }
 }
 
 
 void game_generator(Game *game)
 {
+    game_update_spawning(game, game->generation, game->max_difficulty);
+
     int red_x[4] = {1, -1, 0, 0};
     int red_y[4] = {0, 0, 1, -1}; 
-    game_create_ennemy(game, color_red, RED, red_x, red_y); 
+    game_create_ennemy(game, color_red, game->generation[RED], red_x, red_y); 
 
     int orange_x[4] = {2, -2, 0, 0};
     int orange_y[4] = {0, 0, 2, -2}; 
-    game_create_ennemy(game, color_orange, ORANGE, orange_x, orange_y); 
+    game_create_ennemy(game, color_orange, game->generation[ORANGE], orange_x, orange_y); 
     
     int violet_x[4] = {1, -1, 1, -1};
     int violet_y[4] = {1, -1, 1, -1};
 
-    game_create_ennemy(game, color_violet, VIOLET, violet_x, violet_y);
+    game_create_ennemy(game, color_violet, game->generation[VIOLET], violet_x, violet_y);
 
     int rose_x[4] = {2, -2, -2, 2};
     int rose_y[4] = {-2, 2, 2, -2}; 
 
-    game_create_ennemy(game, color_rose, ROSE, rose_x, rose_y); 
+    game_create_ennemy(game, color_rose, game->generation[ROSE], rose_x, rose_y); 
+
+    int blue_x[4] = {3, -3, 0, 0};
+    int blue_y[4] = {0, 0, 3, -3};
+    game_create_ennemy(game, color_blue, game->generation[BLUE], blue_x, blue_y); 
 
 
         // Idée: Blue = square freeze, soit se déplace à moitié, soit gèle le player 
@@ -321,4 +330,21 @@ void game_generator(Game *game)
 
     game_create_ennemy(game, color_blue, RED, blue_x, blue_y); 
     */
+}
+
+
+void game_update_spawning(Game *game, int generation[], int max_difficulty[])
+{
+    int update_turns = 10;
+
+    if (game->turn % update_turns == 0 && game->turn != 0)
+    {
+        for(int i=0; i<COLORS; i++)
+        {
+            if (generation[i] > max_difficulty[i])
+            {
+                generation[i] -= 1; 
+            }
+        }
+    }
 }
