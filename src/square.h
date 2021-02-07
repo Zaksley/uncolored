@@ -22,6 +22,7 @@ typedef enum
     ORANGE = 2,
     ROSE = 3,
     BLUE = 4,
+    GREEN = 5,
 } Frequency; 
 
 typedef struct

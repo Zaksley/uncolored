@@ -5,7 +5,7 @@
 #include "vector.h"
 
 #define GRID_SIZE 20
-#define COLORS 5
+#define COLORS 6
 
 typedef struct
 {
@@ -39,3 +39,5 @@ int game_slide_square(Game* game, Square* square, SquareType type, float dt);
 void game_move_square(Game* game, Square* square, SquareType type);
 void game_generator(Game* game); 
 void game_create_ennemy(Game* game, Color color, Frequency frequence, int dire_x[], int dire_y[]); 
+
+int color_equal(Color color_1, Color color_2);

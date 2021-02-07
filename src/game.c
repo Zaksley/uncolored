@@ -16,8 +16,8 @@ void game_init(GameWindow* game_window, Game* game)
     game->turn = 0;
     game->ennemies_updated = 1;
 
-    int copy_generation[COLORS] = {2, 3, 4, 5, 6};
-    int copy_difficulty[COLORS] = {1, 1, 2, 2, 3}; 
+    int copy_generation[COLORS] = {2, 3, 4, 5, 6, 7};
+    int copy_difficulty[COLORS] = {1, 1, 2, 2, 3, 4}; 
 
     memcpy(game->generation, copy_generation, sizeof(int) * COLORS);
     memcpy(game->max_difficulty, copy_difficulty, sizeof(int) * COLORS);
@@ -288,6 +288,62 @@ void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x
                 break;
         }
         
+            //Special comportments 
+        if (color_equal(color, color_green))
+        {
+           int x_2, x_3, y_2, y_3; 
+
+
+               //Left or right
+            if (side == 0 || side == 1)
+            {
+               x_2 = x;
+               x_3 = x;
+
+               if (y == 0)
+               {
+                  y_2 = y+1;
+                  y_3 = y+2; 
+               }
+               else if (y == GRID_SIZE-1)
+               {
+                  y_2 = y-1;
+                  y_3 = y-2;
+               }
+               else
+               {
+                  y_2 = y-1;
+                  y_3 = y+1; 
+               }
+            }
+            
+               //Bottom or Top 
+            else
+            {
+               y_2 = y;
+               y_3 = y;
+               if (x == 0)
+               {
+                  x_2 = x+1;
+                  x_3 = x+2;
+               }
+               else if (x == GRID_SIZE-1)
+               {
+                  x_2 = x-1;
+                  x_3 = x-2; 
+               }
+               else
+               {
+                  x_2 = x-1;
+                  x_3 = x+1; 
+               }
+            }
+
+            game_add_ennemy(game, square_create(x_2, y_2, 1, color_green, direction_x, direction_y)); 
+            game_add_ennemy(game, square_create(x_3, y_3, 1, color_green, direction_x, direction_y)); 
+
+        }   
+
         game_add_ennemy(game, square_create(x, y, 1, color,  direction_x, direction_y));
     }
 }
@@ -320,6 +376,8 @@ void game_generator(Game *game)
     game_create_ennemy(game, color_blue, game->generation[BLUE], blue_x, blue_y); 
 
 
+   game_create_ennemy(game, color_green, game->generation[GREEN], red_x, red_y); 
+
         // Idée: Blue = square freeze, soit se déplace à moitié, soit gèle le player 
     /*
     int blue_x[4] = {0.5, -0.5, 0, 0}; 
@@ -344,4 +402,14 @@ void game_update_spawning(Game *game, int generation[], int max_difficulty[])
             }
         }
     }
+}
+
+int color_equal(Color color_1, Color color_2)
+{
+    if (color_1.a != color_2.a) return 0;
+    if (color_1.r != color_2.r) return 0;
+    if (color_1.b != color_2.b) return 0;
+    if (color_1.g != color_2.g) return 0;
+
+    return 1; 
 }
