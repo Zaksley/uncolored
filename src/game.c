@@ -15,6 +15,8 @@ void game_init(GameWindow* game_window, Game* game)
     game->player = square_create(GRID_SIZE/2, GRID_SIZE/2, 1, color_white, 0, 0);
     game->turn = 0;
     game->ennemies_updated = 1;
+    game->shake_force = 0.f;
+    game->shake_time = 0.f;
 
     int copy_generation[COLORS] = {2, 3, 4, 5, 6, 7};
     int copy_difficulty[COLORS] = {1, 1, 2, 2, 3, 4}; 
@@ -101,23 +103,31 @@ void game_update(GameWindow* game_window, Game* game)
 
         game->ennemies_updated = updated;
     }
+
+    // Update game shake
+    game->shake_time += game_window->dt / 3.f;
+
+    if (game->player.moving)
+    {
+        game->shake_time -= 1.5f * game_window->dt;
+
+        if (game->shake_time <= 0.f)
+            game->shake_time = 0.f;
+    }
+
+    game->shake_force = expf(logf(2.f + game->turn) * game->shake_time) - 1.f; //Validé: e^(4*shake_force)-1
+
+    if (game->shake_force >= 20.f)
+        game->player.alive = 0;
+
+    printf("shake force: %f\n", game->shake_force);
 }
 
 void game_draw(GameWindow* game_window, Game* game)
 {
     Effect effect = no_effect();
-    effect.shake = 1;
-
-    game->shake_force += game_window->dt / 5.f;
-    effect.shake_force = game->shake_force * game->shake_force * game->shake_force * game->shake_force;
-    
-    if (game->player.moving)
-    {
-        game->shake_force -= game_window->dt;
-
-        if (game->shake_force <= 0.f)
-            game->shake_force = 0.f;
-    }
+    effect.shake = game->player.alive;
+    effect.shake_force = game->shake_force;
 
     // Draw first ennemis
     for (size_t i=0; i<vector_size(&game->ennemies); i++)
@@ -130,23 +140,9 @@ void game_draw(GameWindow* game_window, Game* game)
     }
         
     // Draw player
-    effect = no_effect();
-    effect.shake = 1;
-
-    game->shake_force += game_window->dt / 3.f;
-    effect.shake_force = game->shake_force * game->shake_force * game->shake_force * game->shake_force;
-
-    if (game->player.moving)
-    {
-        effect.fade = 1;
-        effect.dir_x = (float)game->player.direction_x;
-        effect.dir_y = (float)game->player.direction_y;
-
-        game->shake_force -= game_window->dt;
-
-        if (game->shake_force <= 0.f)
-            game->shake_force = 0.f;
-    }
+    effect.fade = game->player.moving;
+    effect.dir_x = (float)game->player.direction_x;
+    effect.dir_y = (float)game->player.direction_y;
 
     square_draw(&game->player, game_window, effect);
 }
@@ -164,7 +160,7 @@ void game_add_ennemy(Game* game, Square ennemy)
 
 int game_update_ennemy(Game* game, Square* ennemy, float dt)
 {
-        // Kill player before moving
+    // Kill player before moving
     if (square_overlap(ennemy, &game->player))
         game->player.alive = 0;
 
@@ -174,14 +170,14 @@ int game_update_ennemy(Game* game, Square* ennemy, float dt)
 
     if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
         moved = game_slide_square(game, ennemy, ENNEMY, dt);
-    //TODO Gérez collisions ennemis 
     else
     {
+        // TODO: se servir de game_find_ennemy by pos
         ennemy->alive = 0;
         return 1;
     }
 
-        // Kill player after moving 
+    // Kill player after moving 
     if (square_overlap(ennemy, &game->player))
         game->player.alive = 0;
 
@@ -250,7 +246,7 @@ void game_move_square(Game* game, Square* square, SquareType type)
 
 void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x[], int dire_y[])
 {
-        //Creation basic ennemy
+    //Creation basic ennemy
     if (game->turn % frequence == 0)
     { 
         int side = rand() % 4; 
@@ -288,7 +284,7 @@ void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x
                 break;
         }
         
-            //Special comportments 
+        //Special comportments 
         if (color_equal(color, color_green))
         {
            int x_2, x_3, y_2, y_3; 
@@ -376,9 +372,9 @@ void game_generator(Game *game)
     game_create_ennemy(game, color_blue, game->generation[BLUE], blue_x, blue_y); 
 
 
-   game_create_ennemy(game, color_green, game->generation[GREEN], red_x, red_y); 
+    game_create_ennemy(game, color_green, game->generation[GREEN], red_x, red_y); 
 
-        // Idée: Blue = square freeze, soit se déplace à moitié, soit gèle le player 
+    // Idée: Blue = square freeze, soit se déplace à moitié, soit gèle le player 
     /*
     int blue_x[4] = {0.5, -0.5, 0, 0}; 
     int blue_y[4] = {0, 0, 0.5, -0.5}; 
@@ -402,6 +398,19 @@ void game_update_spawning(Game *game, int generation[], int max_difficulty[])
             }
         }
     }
+}
+
+Square* game_find_ennemy_by_pos(Game* game, int x, int y)
+{
+    Square* ennemies = vector_at(&game->ennemies, 0);
+    size_t ennemy_count = vector_size(&game->ennemies);
+    for (Square* ennemy=ennemies; ennemy != ennemies + ennemy_count; ennemy++)
+    {
+        if (ennemy->x == x && ennemy->y == y)
+            return ennemy;
+    }
+
+    return NULL;
 }
 
 int color_equal(Color color_1, Color color_2)

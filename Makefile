@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -g
-LDFLAGS=-lglfw -lGL -lGLEW
+LDFLAGS=-lm -lglfw -lGL -lGLEW
 EXEC=furry-adventure
 SRC_FOLDER=src/
 OBJ_FOLDER=obj/
