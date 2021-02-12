@@ -120,7 +120,6 @@ void game_update(GameWindow* game_window, Game* game)
     if (game->shake_force >= 20.f)
         game->player.alive = 0;
 
-    printf("shake force: %f\n", game->shake_force);
 }
 
 void game_draw(GameWindow* game_window, Game* game)
@@ -172,9 +171,9 @@ int game_update_ennemy(Game* game, Square* ennemy, float dt)
         moved = game_slide_square(game, ennemy, ENNEMY, dt);
     else
     {
-        // TODO: se servir de game_find_ennemy by pos
-        ennemy->alive = 0;
-        return 1;
+        Square* already_here = vector_ennemy_from_pos(&game->ennemies, next_pos_x, next_pos_y); 
+        already_here->alive = 0;
+        moved = game_slide_square(game, ennemy, ENNEMY, dt);
     }
 
     // Kill player after moving 

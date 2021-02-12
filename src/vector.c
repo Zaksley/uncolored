@@ -90,3 +90,19 @@ int _vector_resize(vector* vector, size_t capacity)
 
     return 1;
 }
+
+Square* vector_ennemy_from_pos(vector* vector, int x, int y)
+{ 
+    Square* searching = NULL; 
+    for(size_t i=0; i<vector->size; i++)
+    {
+        searching = vector_at(vector, i);
+
+        if (searching->x == x && searching->y == y)
+        {
+            return searching; 
+        }
+    }
+
+    return NULL; 
+}

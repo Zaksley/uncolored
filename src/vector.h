@@ -31,3 +31,8 @@ int vector_remove(vector* vector, size_t i);
 void vector_free(vector* vector);
 // Resize the capacity of the vector
 int _vector_resize(vector* vector, size_t capacity);
+
+
+
+// Give the square to the coordinates (x,y)
+Square* vector_ennemy_from_pos(vector* vector, int x, int y);
