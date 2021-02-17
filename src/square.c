@@ -1,14 +1,15 @@
 #include "square.h"
 
-Square square_create(int x, int y, int size, Color color, int direction_x, int direction_y)
+Square square_create(int x, int y, int size, Color color, int rank, int direction_x, int direction_y)
 {
-    Square square = { x, y, size, color, direction_x, direction_y, 1, 0, 0, x, y };
+    
+    Square square = { x, y, size, color, rank, direction_x, direction_y, 1, 0, 0, x, y };
     return square;
 }
 
 int square_overlap(Square* s1, Square* s2)
 {
-    return s1->x == s2->x && s1->y == s2->y;
+    return (s1->x == s2->x && s1->y == s2->y);
 }
 
 void square_draw(Square* square, GameWindow* game_window, Effect effect)

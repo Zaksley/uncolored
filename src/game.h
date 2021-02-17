@@ -40,7 +40,7 @@ void game_remove_enemy(Game* game, size_t index);
 int game_slide_square(Game* game, Square* square, SquareType type, float dt);
 void game_move_square(Game* game, Square* square, SquareType type);
 void game_generator(Game* game); 
-void game_create_ennemy(Game* game, Color color, Frequency frequence, int dire_x[], int dire_y[]);
+void game_create_ennemy(Game* game, Color color, int rank, Frequency frequence, int dire_x[], int dire_y[]);
 
 Square* find_ennemy_by_pos(Game* game, int x, int y);
 

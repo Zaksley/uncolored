@@ -12,7 +12,7 @@ void game_init(GameWindow* game_window, Game* game)
 {
     input_state_set_window(&game->input, game_window->glfw_window);
 
-    game->player = square_create(GRID_SIZE/2, GRID_SIZE/2, 1, color_white, 0, 0);
+    game->player = square_create(GRID_SIZE/2, GRID_SIZE/2, 1, color_white, WHITE, 0, 0);
     game->turn = 0;
     game->ennemies_updated = 1;
     game->shake_force = 0.f;
@@ -161,24 +161,46 @@ int game_update_ennemy(Game* game, Square* ennemy, float dt)
 {
     // Kill player before moving
     if (square_overlap(ennemy, &game->player))
+    {
+        printf("Bien joué! Ton score est de %d", game->turn);
         game->player.alive = 0;
+        return 1; 
+    }
 
     int moved = 0;
     int next_pos_x = ennemy->x + ennemy->direction_x;
     int next_pos_y = ennemy->y + ennemy->direction_y;
 
+        // Case non occupée
     if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
         moved = game_slide_square(game, ennemy, ENNEMY, dt);
+
+        // Case déjà occupée
     else
     {
         Square* already_here = vector_ennemy_from_pos(&game->ennemies, next_pos_x, next_pos_y); 
-        already_here->alive = 0;
-        moved = game_slide_square(game, ennemy, ENNEMY, dt);
+
+            // Ecrase le square de rank inférieur
+        if (already_here->rank <= ennemy->rank) 
+        {
+            already_here->alive = 0;
+            moved = game_slide_square(game, already_here, ENNEMY, dt);
+        }
+            // Laisse en place le square déjà posé
+        else
+        {
+            ennemy->alive = 0;
+            moved = game_slide_square(game, ennemy, ENNEMY, dt);
+        }   
     }
 
     // Kill player after moving 
     if (square_overlap(ennemy, &game->player))
+    {
+        printf("Bien joué! Ton score est de %d\n", game->turn);
         game->player.alive = 0;
+        return 1; 
+    }
 
     return moved;
 }
@@ -243,7 +265,7 @@ void game_move_square(Game* game, Square* square, SquareType type)
     game->grid[square->x][square->y] = type;
 }
 
-void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x[], int dire_y[])
+void game_create_ennemy(Game *game, Color color, int rank, Frequency frequence, int dire_x[], int dire_y[])
 {
     //Creation basic ennemy
     if (game->turn % frequence == 0)
@@ -334,44 +356,45 @@ void game_create_ennemy(Game *game, Color color, Frequency frequence, int dire_x
                }
             }
 
-            game_add_ennemy(game, square_create(x_2, y_2, 1, color_green, direction_x, direction_y)); 
-            game_add_ennemy(game, square_create(x_3, y_3, 1, color_green, direction_x, direction_y)); 
+            game_add_ennemy(game, square_create(x_2, y_2, 1, color_green, rank, direction_x, direction_y)); 
+            game_add_ennemy(game, square_create(x_3, y_3, 1, color_green, rank, direction_x, direction_y)); 
 
         }   
 
-        game_add_ennemy(game, square_create(x, y, 1, color,  direction_x, direction_y));
+        game_add_ennemy(game, square_create(x, y, 1, color, rank, direction_x, direction_y));
     }
 }
 
 
 void game_generator(Game *game)
 {
+    
     game_update_spawning(game, game->generation, game->max_difficulty);
 
     int red_x[4] = {1, -1, 0, 0};
     int red_y[4] = {0, 0, 1, -1}; 
-    game_create_ennemy(game, color_red, game->generation[RED], red_x, red_y); 
+    game_create_ennemy(game, color_red, RED, game->generation[RED], red_x, red_y); 
 
     int orange_x[4] = {2, -2, 0, 0};
     int orange_y[4] = {0, 0, 2, -2}; 
-    game_create_ennemy(game, color_orange, game->generation[ORANGE], orange_x, orange_y); 
+    game_create_ennemy(game, color_orange, ORANGE, game->generation[ORANGE], orange_x, orange_y); 
     
     int violet_x[4] = {1, -1, 1, -1};
     int violet_y[4] = {1, -1, 1, -1};
 
-    game_create_ennemy(game, color_violet, game->generation[VIOLET], violet_x, violet_y);
+    game_create_ennemy(game, color_violet, VIOLET, game->generation[VIOLET], violet_x, violet_y);
 
     int rose_x[4] = {2, -2, -2, 2};
     int rose_y[4] = {-2, 2, 2, -2}; 
 
-    game_create_ennemy(game, color_rose, game->generation[ROSE], rose_x, rose_y); 
+    game_create_ennemy(game, color_rose, ROSE, game->generation[ROSE], rose_x, rose_y); 
 
     int blue_x[4] = {3, -3, 0, 0};
     int blue_y[4] = {0, 0, 3, -3};
-    game_create_ennemy(game, color_blue, game->generation[BLUE], blue_x, blue_y); 
+    game_create_ennemy(game, color_blue, BLUE, game->generation[BLUE], blue_x, blue_y); 
 
 
-    game_create_ennemy(game, color_green, game->generation[GREEN], red_x, red_y); 
+    game_create_ennemy(game, color_green, GREEN, game->generation[GREEN], red_x, red_y); 
 
     // Idée: Blue = square freeze, soit se déplace à moitié, soit gèle le player 
     /*
