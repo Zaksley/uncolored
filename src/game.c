@@ -135,6 +135,14 @@ void game_draw(GameWindow* game_window, Game* game)
         effect.fade = ennemy->moving;
         effect.dir_x = (float)ennemy->direction_x;
         effect.dir_y = (float)ennemy->direction_y;
+
+        if (!ennemy->alive)
+        {
+            effect.fade = 1;
+            effect.dir_x = 0;
+            effect.dir_y = 0;
+        }
+
         square_draw(ennemy, game_window, effect);
     }
         
