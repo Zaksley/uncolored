@@ -171,22 +171,28 @@ int game_update_ennemy(Game* game, Square* ennemy, float dt)
     int next_pos_x = ennemy->x + ennemy->direction_x;
     int next_pos_y = ennemy->y + ennemy->direction_y;
 
-        // Case non occupée
+    if (next_pos_x < 0 || next_pos_y < 0
+        || next_pos_x >= GRID_SIZE || next_pos_y >= GRID_SIZE)
+    {
+        return game_slide_square(game, ennemy, ENNEMY, dt);
+    }
+
+    // Case non occupée
     if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
         moved = game_slide_square(game, ennemy, ENNEMY, dt);
 
-        // Case déjà occupée
+    // Case déjà occupée
     else
     {
         Square* already_here = vector_ennemy_from_pos(&game->ennemies, next_pos_x, next_pos_y); 
 
-            // Ecrase le square de rank inférieur
+        // Ecrase le square de rank inférieur
         if (already_here->rank <= ennemy->rank) 
         {
             already_here->alive = 0;
             moved = game_slide_square(game, already_here, ENNEMY, dt);
         }
-            // Laisse en place le square déjà posé
+        // Laisse en place le square déjà posé
         else
         {
             ennemy->alive = 0;
