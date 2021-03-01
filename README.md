@@ -1,2 +1,3 @@
-# furry-adventure
-The most funny game with only squares
+# Uncolored
+
+The most funny game with only squares... 
