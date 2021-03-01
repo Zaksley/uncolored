@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-Wall -O3
 LDFLAGS=-lm -lglfw -lGL -lGLEW
 EXEC=uncolored
 SRC_FOLDER=src/
