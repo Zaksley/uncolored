@@ -32,6 +32,8 @@ void game_update(GameWindow* game_window, Game* game);
 void game_draw(GameWindow* game_window, Game* game);
 void game_free(Game* game);
 
+void game_premoving_ennemies(Game* game, int x, int y); 
+
 void game_add_ennemy(Game* game, Square ennemy);
 int game_update_ennemy(Game* game, Square* ennemy, float dt);
 void game_update_spawning(Game* game, int generation[], int max_difficulty[]);

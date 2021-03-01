@@ -80,6 +80,15 @@ void game_update(GameWindow* game_window, Game* game)
         game->ennemies_updated = 0;
         game->turn++;
 
+            // Updating already ennemy alive or not 
+        for(int i=0; i<GRID_SIZE; i++)
+        {
+            for(int j=0; j<GRID_SIZE; j++)
+            {
+                game_premoving_ennemies(game, i, j); 
+            }
+        }
+
         // Everybody start moving
         Square* ennemies = vector_at(&game->ennemies, 0);
         size_t ennemy_count = vector_size(&game->ennemies);
@@ -118,7 +127,10 @@ void game_update(GameWindow* game_window, Game* game)
     game->shake_force = expf(logf(2.f + game->turn) * game->shake_time) - 1.f; //Validé: e^(4*shake_force)-1
 
     if (game->shake_force >= 20.f)
+    {    
         game->player.alive = 0;
+        printf("Bien joué! Ton score est de %d\n", game->turn);
+    }
 
 }
 
@@ -170,7 +182,7 @@ int game_update_ennemy(Game* game, Square* ennemy, float dt)
     // Kill player before moving
     if (square_overlap(ennemy, &game->player))
     {
-        printf("Bien joué! Ton score est de %d", game->turn);
+        printf("Bien joué! Ton score est de %d\n", game->turn);
         game->player.alive = 0;
         return 1; 
     }
@@ -179,34 +191,38 @@ int game_update_ennemy(Game* game, Square* ennemy, float dt)
     int next_pos_x = ennemy->x + ennemy->direction_x;
     int next_pos_y = ennemy->y + ennemy->direction_y;
 
-    if (next_pos_x < 0 || next_pos_y < 0
+    moved = game_slide_square(game, ennemy, ENNEMY, dt); 
+
+        if (next_pos_x < 0 || next_pos_y < 0
         || next_pos_x >= GRID_SIZE || next_pos_y >= GRID_SIZE)
     {
         return game_slide_square(game, ennemy, ENNEMY, dt);
     }
 
-    // Case non occupée
+    /*
+        // Case non occupée
     if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
         moved = game_slide_square(game, ennemy, ENNEMY, dt);
 
-    // Case déjà occupée
+        // Case déjà occupée
     else
     {
         Square* already_here = vector_ennemy_from_pos(&game->ennemies, next_pos_x, next_pos_y); 
 
-        // Ecrase le square de rank inférieur
+            // Ecrase le square de rank inférieur
         if (already_here->rank <= ennemy->rank) 
         {
             already_here->alive = 0;
             moved = game_slide_square(game, already_here, ENNEMY, dt);
         }
-        // Laisse en place le square déjà posé
+            // Laisse en place le square déjà posé
         else
         {
             ennemy->alive = 0;
             moved = game_slide_square(game, ennemy, ENNEMY, dt);
         }   
     }
+    */
 
     // Kill player after moving 
     if (square_overlap(ennemy, &game->player))
@@ -448,6 +464,40 @@ Square* game_find_ennemy_by_pos(Game* game, int x, int y)
 
     return NULL;
 }
+
+void game_premoving_ennemies(Game* game, int x, int y)
+{
+    int nb_ennemies = 0; 
+    Square* square = NULL;  
+
+    Square* ennemies = vector_at(&game->ennemies, 0);
+    size_t ennemy_count = vector_size(&game->ennemies);
+    for (Square* ennemy=ennemies; ennemy != ennemies + ennemy_count; ennemy++)
+    {
+        if (x == ennemy->x + ennemy->direction_x && y == ennemy->y + ennemy->direction_y)
+        {
+            nb_ennemies++; 
+            if (square == NULL) 
+            {
+                square = ennemy;
+                continue;
+            }
+
+                // Update interesting ennemy 
+            if (square->rank < ennemy->rank)
+            {
+                square->alive = 0;
+                square = ennemy;
+            }
+                //Not moving - Killing bad ennemy
+            else
+            {
+                ennemy->alive = 0; 
+            }
+        }
+    }
+}
+
 
 int color_equal(Color color_1, Color color_2)
 {
