@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -g
 LDFLAGS=-lm -lglfw -lGL -lGLEW
-EXEC=furry-adventure
+EXEC=uncolored
 SRC_FOLDER=src/
 OBJ_FOLDER=obj/
 SRC=$(wildcard $(SRC_FOLDER)*.c)

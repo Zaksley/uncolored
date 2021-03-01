@@ -36,7 +36,7 @@ int game_window_init(GameWindow* window, int width, int height, const char* titl
     /* Create a windowed mode window and its OpenGL context */
     window->width = width;
     window->height = height;
-    window->glfw_window = glfwCreateWindow(width, height, "Furry Adventure", NULL, NULL);
+    window->glfw_window = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!window)
     {
         glfwTerminate();

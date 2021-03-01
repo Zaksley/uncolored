@@ -5,7 +5,7 @@ int main(int argc, char const *argv[])
     srand(time(NULL));
 
     GameWindow window;
-    if (!game_window_init(&window, 640, 640, "Furry Adventure"))
+    if (!game_window_init(&window, 640, 640, "Uncolored"))
         return 1;
 
     Game game;

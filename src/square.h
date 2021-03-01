@@ -8,14 +8,6 @@
 
 typedef enum
 {
-    NOTHING,
-    PLAYER,
-    ENNEMY,
-    WEIRD_SQUARE
-} SquareType;
-
-typedef enum
-{
     WHITE = -1,
     RED = 0,
     VIOLET = 1,

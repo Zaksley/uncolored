@@ -20,19 +20,10 @@ void game_init(GameWindow* game_window, Game* game)
 
     int copy_generation[COLORS] = {2, 3, 4, 5, 6, 7};
     int copy_difficulty[COLORS] = {1, 1, 2, 2, 3, 4}; 
-
     memcpy(game->generation, copy_generation, sizeof(int) * COLORS);
     memcpy(game->max_difficulty, copy_difficulty, sizeof(int) * COLORS);
 
-    // Init grid
-    for (int i=0; i<GRID_SIZE; i++)
-    {
-        for (int j=0; j<GRID_SIZE; j++)
-            game->grid[i][j] = NOTHING;
-    }
-
     vector_init(&game->ennemies, 10);
-
 }
 
 void game_update(GameWindow* game_window, Game* game)
@@ -71,7 +62,7 @@ void game_update(GameWindow* game_window, Game* game)
     int moved = 0;
     if ((game->player.direction_x != 0 || game->player.direction_y != 0 || game->player.moving)
         && game->ennemies_updated)
-        moved = game_slide_square(game, &game->player, PLAYER, game_window->dt);
+        moved = game_slide_square(game, &game->player, game_window->dt);
 
     if (moved)
     {
@@ -84,9 +75,7 @@ void game_update(GameWindow* game_window, Game* game)
         for(int i=0; i<GRID_SIZE; i++)
         {
             for(int j=0; j<GRID_SIZE; j++)
-            {
                 game_premoving_ennemies(game, i, j); 
-            }
         }
 
         // Everybody start moving
@@ -174,7 +163,6 @@ void game_free(Game* game)
 void game_add_ennemy(Game* game, Square ennemy)
 {
     vector_push(&game->ennemies, ennemy);
-    game->grid[ennemy.x][ennemy.y] = ENNEMY;
 }
 
 int game_update_ennemy(Game* game, Square* ennemy, float dt)
@@ -191,38 +179,11 @@ int game_update_ennemy(Game* game, Square* ennemy, float dt)
     int next_pos_x = ennemy->x + ennemy->direction_x;
     int next_pos_y = ennemy->y + ennemy->direction_y;
 
-    moved = game_slide_square(game, ennemy, ENNEMY, dt); 
+    moved = game_slide_square(game, ennemy, dt); 
 
-        if (next_pos_x < 0 || next_pos_y < 0
+    if (next_pos_x < 0 || next_pos_y < 0
         || next_pos_x >= GRID_SIZE || next_pos_y >= GRID_SIZE)
-    {
-        return game_slide_square(game, ennemy, ENNEMY, dt);
-    }
-
-    /*
-        // Case non occupée
-    if (game->grid[next_pos_x][next_pos_y] != ENNEMY)
-        moved = game_slide_square(game, ennemy, ENNEMY, dt);
-
-        // Case déjà occupée
-    else
-    {
-        Square* already_here = vector_ennemy_from_pos(&game->ennemies, next_pos_x, next_pos_y); 
-
-            // Ecrase le square de rank inférieur
-        if (already_here->rank <= ennemy->rank) 
-        {
-            already_here->alive = 0;
-            moved = game_slide_square(game, already_here, ENNEMY, dt);
-        }
-            // Laisse en place le square déjà posé
-        else
-        {
-            ennemy->alive = 0;
-            moved = game_slide_square(game, ennemy, ENNEMY, dt);
-        }   
-    }
-    */
+        return game_slide_square(game, ennemy, dt);
 
     // Kill player after moving 
     if (square_overlap(ennemy, &game->player))
@@ -250,12 +211,10 @@ void game_check_ennemies_death(Game* game)
 
 void game_remove_enemy(Game* game, size_t index)
 {
-    Square* ennemy = vector_at(&game->ennemies, index); 
-    game->grid[ennemy->x][ennemy->y] = NOTHING;
     vector_remove(&game->ennemies, index);
 }
 
-int game_slide_square(Game* game, Square* square, SquareType type, float dt)
+int game_slide_square(Game* game, Square* square, float dt)
 {
     square->move_timer += MOVE_AMOUNT;
     square->move_x += square->direction_x * SIZE_SQUARE * (MOVE_AMOUNT/SLIDE_TIME) * dt;
@@ -266,14 +225,14 @@ int game_slide_square(Game* game, Square* square, SquareType type, float dt)
         square->move_timer = 0.f;
         square->moving = 0;
 
-        game_move_square(game, square, type);
+        game_move_square(game, square);
     }
     else square->moving = 1;
 
     return !square->moving;
 }
 
-void game_move_square(Game* game, Square* square, SquareType type)
+void game_move_square(Game* game, Square* square)
 {
     int next_pos_x = square->x + square->direction_x;
     int next_pos_y = square->y + square->direction_y;
@@ -285,14 +244,10 @@ void game_move_square(Game* game, Square* square, SquareType type)
         return;
     }
 
-    game->grid[square->x][square->y] = NOTHING;
-
     square->x = next_pos_x;
     square->move_x = next_pos_x;
     square->y = next_pos_y;
     square->move_y = next_pos_y;
-
-    game->grid[square->x][square->y] = type;
 }
 
 void game_create_ennemy(Game *game, Color color, int rank, Frequency frequence, int dire_x[], int dire_y[])
@@ -425,14 +380,6 @@ void game_generator(Game *game)
 
 
     game_create_ennemy(game, color_green, GREEN, game->generation[GREEN], red_x, red_y); 
-
-    // Idée: Blue = square freeze, soit se déplace à moitié, soit gèle le player 
-    /*
-    int blue_x[4] = {0.5, -0.5, 0, 0}; 
-    int blue_y[4] = {0, 0, 0.5, -0.5}; 
-
-    game_create_ennemy(game, color_blue, RED, blue_x, blue_y); 
-    */
 }
 
 
@@ -445,9 +392,7 @@ void game_update_spawning(Game *game, int generation[], int max_difficulty[])
         for(int i=0; i<COLORS; i++)
         {
             if (generation[i] > max_difficulty[i])
-            {
                 generation[i] -= 1; 
-            }
         }
     }
 }
@@ -480,7 +425,7 @@ void game_premoving_ennemies(Game* game, int x, int y)
             if (square == NULL) 
             {
                 square = ennemy;
-                continue;
+                continue;   
             }
 
                 // Update interesting ennemy 
@@ -491,9 +436,7 @@ void game_premoving_ennemies(Game* game, int x, int y)
             }
                 //Not moving - Killing bad ennemy
             else
-            {
                 ennemy->alive = 0; 
-            }
         }
     }
 }
